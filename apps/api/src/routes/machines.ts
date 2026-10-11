@@ -158,7 +158,7 @@ machinesRouter.patch(
       const machine = await Machine.findOneAndUpdate(
         { _id: id, orgId },
         parsed.data,
-        { new: true, runValidators: true },
+        { returnDocument: "after", runValidators: true },
       );
       if (!machine) {
         res.status(404).json({ error: "Machine not found" });

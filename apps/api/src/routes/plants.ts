@@ -121,7 +121,7 @@ plantsRouter.patch(
       const plant = await Plant.findOneAndUpdate(
         { _id: id, orgId },
         parsed.data,
-        { new: true, runValidators: true },
+        { returnDocument: "after", runValidators: true },
       );
       if (!plant) {
         res.status(404).json({ error: "Plant not found" });

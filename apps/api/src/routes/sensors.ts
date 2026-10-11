@@ -172,7 +172,7 @@ sensorsRouter.patch(
       const sensor = await Sensor.findOneAndUpdate(
         { _id: id, orgId },
         parsed.data,
-        { new: true, runValidators: true },
+        { returnDocument: "after", runValidators: true },
       );
       if (!sensor) {
         res.status(404).json({ error: "Sensor not found" });
