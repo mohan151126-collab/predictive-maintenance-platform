@@ -1,0 +1,13 @@
+{
+  "name": "predictive-maintenance",
+  "private": true,
+  "scripts": {
+    "infra:up": "docker compose up -d",
+    "infra:down": "docker compose down",
+    "infra:ps": "docker compose ps -a",
+    "infra:logs": "docker compose logs -f"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
