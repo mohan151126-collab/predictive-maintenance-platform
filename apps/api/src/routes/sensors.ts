@@ -190,3 +190,23 @@ sensorsRouter.patch(
     }
   },
 );
+
+sensorsRouter.delete(
+  "/:id",
+  requireRole("admin", "manager"),
+  async (req, res) => {
+    const { orgId } = req.auth!;
+    const { id } = req.params;
+    if (!mongoose.isValidObjectId(id)) {
+      res.status(404).json({ error: "Sensor not found" });
+      return;
+    }
+
+    const deleted = await Sensor.findOneAndDelete({ _id: id, orgId });
+    if (!deleted) {
+      res.status(404).json({ error: "Sensor not found" });
+      return;
+    }
+    res.status(204).end();
+  },
+);
