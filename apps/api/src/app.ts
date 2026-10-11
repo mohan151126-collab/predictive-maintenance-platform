@@ -3,6 +3,7 @@ import cors from "cors";
 import express, { type ErrorRequestHandler } from "express";
 import helmet from "helmet";
 import { authRouter } from "./routes/auth.js";
+import { meRouter } from "./routes/me.js";
 
 const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   if (err?.type === "entity.parse.failed") {
@@ -26,6 +27,7 @@ export function createApp() {
   });
 
   app.use("/api/auth", authRouter);
+  app.use("/api/me", meRouter);
 
   app.use(errorHandler);
 
