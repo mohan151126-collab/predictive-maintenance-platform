@@ -3,6 +3,7 @@ import cors from "cors";
 import express, { type ErrorRequestHandler } from "express";
 import helmet from "helmet";
 import { authRouter } from "./routes/auth.js";
+import { machinesRouter } from "./routes/machines.js";
 import { meRouter } from "./routes/me.js";
 import { plantsRouter } from "./routes/plants.js";
 
@@ -30,6 +31,7 @@ export function createApp() {
   app.use("/api/auth", authRouter);
   app.use("/api/me", meRouter);
   app.use("/api/plants", plantsRouter);
+  app.use("/api/machines", machinesRouter);
 
   app.use(errorHandler);
 
