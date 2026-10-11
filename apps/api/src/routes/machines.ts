@@ -5,6 +5,7 @@ import { requireAuth, requireRole } from "../auth/middleware.js";
 import { isDuplicateKeyError } from "../lib/mongo-errors.js";
 import { Machine } from "../models/machine.js";
 import { Plant } from "../models/plant.js";
+import { Sensor } from "../models/sensor.js";
 
 const objectId = z
   .string()
@@ -173,5 +174,33 @@ machinesRouter.patch(
       }
       throw err;
     }
+  },
+);
+machinesRouter.delete(
+  "/:id",
+  requireRole("admin", "manager"),
+  async (req, res) => {
+    const { orgId } = req.auth!;
+    const { id } = req.params;
+    if (!mongoose.isValidObjectId(id)) {
+      res.status(404).json({ error: "Machine not found" });
+      return;
+    }
+
+    const machine = await Machine.findOne({ _id: id, orgId });
+    if (!machine) {
+      res.status(404).json({ error: "Machine not found" });
+      return;
+    }
+
+    if (await Sensor.exists({ machineId: machine._id, orgId })) {
+      res
+        .status(409)
+        .json({ error: "Delete this machine's sensors first" });
+      return;
+    }
+
+    await machine.deleteOne();
+    res.status(204).end();
   },
 );
