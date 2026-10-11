@@ -1,7 +1,18 @@
 import { createApp } from "./app.js";
+import { config } from "./config.js";
+import { connectDb, disconnectDb } from "./db.js";
 
-const port = Number(process.env.PORT ?? 4000);
+await connectDb();
 
-createApp().listen(port, () => {
-  console.log(`API listening on http://localhost:${port}`);
+const server = createApp().listen(config.PORT, () => {
+  console.log(`API listening on http://localhost:${config.PORT}`);
 });
+
+async function shutdown() {
+  server.close();
+  await disconnectDb();
+  process.exit(0);
+}
+
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);
