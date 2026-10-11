@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { z } from "zod";
 import { requireAuth, requireRole } from "../auth/middleware.js";
 import { isDuplicateKeyError } from "../lib/mongo-errors.js";
+import { Machine } from "../models/machine.js";
 import { Plant } from "../models/plant.js";
 
 function isValidTimezone(tz: string) {
@@ -136,5 +137,34 @@ plantsRouter.patch(
       }
       throw err;
     }
+  },
+);
+
+plantsRouter.delete(
+  "/:id",
+  requireRole("admin", "manager"),
+  async (req, res) => {
+    const { orgId } = req.auth!;
+    const { id } = req.params;
+    if (!mongoose.isValidObjectId(id)) {
+      res.status(404).json({ error: "Plant not found" });
+      return;
+    }
+
+    const plant = await Plant.findOne({ _id: id, orgId });
+    if (!plant) {
+      res.status(404).json({ error: "Plant not found" });
+      return;
+    }
+
+    if (await Machine.exists({ plantId: plant._id, orgId })) {
+      res
+        .status(409)
+        .json({ error: "Delete this plant's machines first" });
+      return;
+    }
+
+    await plant.deleteOne();
+    res.status(204).end();
   },
 );
