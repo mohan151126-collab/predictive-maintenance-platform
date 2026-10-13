@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://predictive-maintenance.local/contracts/telemetry.schema.json",
+  "title": "TelemetryReading",
+  "description": "One reading from one sensor. Published to MQTT and Kafka topic telemetry.raw.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "orgId",
+    "plantId",
+    "machineId",
+    "sensorId",
+    "type",
+    "unit",
+    "value",
+    "ts"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "orgId": { "type": "string", "pattern": "^[a-f0-9]{24}$" },
+    "plantId": { "type": "string", "pattern": "^[a-f0-9]{24}$" },
+    "machineId": { "type": "string", "pattern": "^[a-f0-9]{24}$" },
+    "sensorId": { "type": "string", "pattern": "^[a-f0-9]{24}$" },
+    "type": {
+      "enum": ["vibration_rms", "temperature", "current", "pressure", "rpm"]
+    },
+    "unit": { "type": "string", "minLength": 1, "maxLength": 20 },
+    "value": { "type": "number" },
+    "ts": { "type": "string", "format": "date-time" }
+  }
+}
