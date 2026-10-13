@@ -36,6 +36,16 @@ export function parseFaults(args: string[]): Fault[] {
   return faults;
 }
 
+export function parseSpeed(args: string[]): number {
+  const index = args.indexOf("--speed");
+  if (index === -1) return 1;
+  const speed = Number(args[index + 1]);
+  if (!Number.isFinite(speed) || speed < 1 || speed > 60) {
+    throw new Error(`Invalid --speed "${args[index + 1] ?? ""}". Use a number from 1 to 60, for example --speed 6`);
+  }
+  return speed;
+}
+
 function gaussian(): number {
   const u = 1 - Math.random();
   const v = Math.random();

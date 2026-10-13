@@ -1,9 +1,10 @@
 import mqtt from "mqtt";
 import { loadFleet } from "./api.js";
 import { config } from "./config.js";
-import { nextValue, parseFaults } from "./signals.js";
+import { nextValue, parseFaults, parseSpeed } from "./signals.js";
 
 const faults = parseFaults(process.argv.slice(2));
+const speed = parseSpeed(process.argv.slice(2));
 const fleet = await loadFleet();
 const machines = new Map(fleet.machines.map((m) => [m.id, m]));
 
@@ -33,6 +34,9 @@ console.log(
 for (const fault of faults) {
   console.log(`Fault active: "${fault.machineName}" = ${fault.kind}`);
 }
+if (speed > 1) {
+  console.log(`Faults develop ${speed} times faster than real time.`);
+}
 
 const startedAt = Date.now();
 let published = 0;
@@ -46,7 +50,7 @@ const timers = fleet.sensors.flatMap((sensor) => {
 
   return [
     setInterval(() => {
-      const elapsedMinutes = (Date.now() - startedAt) / 60_000;
+      const elapsedMinutes = ((Date.now() - startedAt) / 60_000) * speed;
       const reading = {
         schemaVersion: 1,
         orgId: fleet.orgId,

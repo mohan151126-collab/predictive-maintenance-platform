@@ -18,7 +18,7 @@ const X_TICKS = [1, 0.75, 0.5, 0.25, 0];
 function ago(ms: number) {
   if (ms < 1000) return "now";
   const seconds = Math.round(ms / 1000);
-  if (seconds < 90) return `-${seconds} s`;
+  if (seconds < 60) return `-${seconds} s`;
   return `-${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
 }
 
