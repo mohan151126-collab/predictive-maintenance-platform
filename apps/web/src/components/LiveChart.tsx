@@ -18,7 +18,8 @@ const X_TICKS = [1, 0.75, 0.5, 0.25, 0];
 function ago(ms: number) {
   if (ms < 1000) return "now";
   const seconds = Math.round(ms / 1000);
-  return seconds < 90 ? `-${seconds} s` : `-${Math.round(seconds / 60)} min`;
+  if (seconds < 90) return `-${seconds} s`;
+  return `-${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
 }
 
 function niceStep(range: number, ticks: number) {
