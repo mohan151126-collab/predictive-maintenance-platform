@@ -1,0 +1,42 @@
+plugins {
+	java
+	id("org.springframework.boot") version "4.1.1"
+	id("io.spring.dependency-management") version "1.1.7"
+}
+
+group = "com.pm"
+version = "0.0.1-SNAPSHOT"
+description = "Stores sensor readings, detects problems and scores machine health"
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation("org.springframework.boot:spring-boot-starter-actuator")
+	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+	implementation("org.springframework.boot:spring-boot-starter-kafka")
+	implementation("org.springframework.boot:spring-boot-starter-webmvc")
+	testImplementation("org.springframework.boot:spring-boot-starter-actuator-test")
+	testImplementation("org.springframework.boot:spring-boot-starter-data-mongodb-test")
+	testImplementation("org.springframework.boot:spring-boot-starter-kafka-test")
+	testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+	testImplementation("com.networknt:json-schema-validator:3.0.8")
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.processTestResources {
+	from(layout.projectDirectory.dir("../../contracts")) {
+		include("*.schema.json", "*.example.json")
+	}
+}
+
+tasks.withType<Test> {
+	useJUnitPlatform()
+}
