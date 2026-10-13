@@ -5,7 +5,18 @@ import {
   type QueryKey,
 } from "@tanstack/react-query";
 import { api } from "./client";
-import type { Alert, Machine, Plant, Sensor, SensorType, TelemetrySeries } from "./types";
+import type {
+  Alert,
+  Machine,
+  Plant,
+  Role,
+  Sensor,
+  SensorType,
+  TeamUser,
+  TelemetrySeries,
+  WorkOrder,
+  WorkOrderPriority,
+} from "./types";
 
 export interface PlantInput {
   name: string;
@@ -158,3 +169,108 @@ export const useTelemetry = (machineId: string, minutes: number) =>
     staleTime: 0,
     refetchOnMount: "always",
   });
+
+function useInvalidatingMany<TVars, TData>(
+  run: (vars: TVars) => Promise<TData>,
+  keys: QueryKey[],
+) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: run,
+    onSuccess: () =>
+      Promise.all(keys.map((queryKey) => queryClient.invalidateQueries({ queryKey }))),
+  });
+}
+
+export const useAllMachines = () =>
+  useQuery({
+    queryKey: ["machines", "list", "all"],
+    queryFn: () => api<Machine[]>("/api/machines"),
+  });
+
+export const useAcknowledgeAlert = () =>
+  useInvalidating(
+    (id: string) => api<Alert>(`/api/alerts/${id}/acknowledge`, { method: "POST" }),
+    ["alerts"],
+  );
+
+export const useDismissAlert = () =>
+  useInvalidating(
+    ({ id, reason }: { id: string; reason: string }) =>
+      api<Alert>(`/api/alerts/${id}/dismiss`, { method: "POST", body: { reason } }),
+    ["alerts"],
+  );
+
+export const useWorkOrders = (
+  options: { status?: string; machineId?: string; mine?: boolean } = {},
+) => {
+  const status = options.status ?? "active";
+  const params = new URLSearchParams({ status });
+  if (options.machineId) params.set("machineId", options.machineId);
+  if (options.mine) params.set("mine", "true");
+  return useQuery({
+    queryKey: ["workOrders", status, options.machineId ?? null, options.mine ?? false],
+    queryFn: () => api<WorkOrder[]>(`/api/work-orders?${params.toString()}`),
+    staleTime: 0,
+    refetchOnMount: "always",
+  });
+};
+
+export interface WorkOrderInput {
+  machineId: string;
+  alertId?: string;
+  title: string;
+  description: string;
+  priority: WorkOrderPriority;
+  assigneeId?: string;
+  dueAt?: string;
+}
+
+export interface CompletionInput {
+  actionTaken: string;
+  partsReplaced?: string;
+  downtimeMinutes?: number;
+}
+
+export const useCreateWorkOrder = () =>
+  useInvalidatingMany(
+    (input: WorkOrderInput) =>
+      api<WorkOrder>("/api/work-orders", { method: "POST", body: input }),
+    [["workOrders"], ["alerts"]],
+  );
+
+export const useStartWorkOrder = () =>
+  useInvalidating(
+    (id: string) => api<WorkOrder>(`/api/work-orders/${id}/start`, { method: "POST" }),
+    ["workOrders"],
+  );
+
+export const useCompleteWorkOrder = () =>
+  useInvalidating(
+    ({ id, input }: { id: string; input: CompletionInput }) =>
+      api<WorkOrder>(`/api/work-orders/${id}/complete`, { method: "POST", body: input }),
+    ["workOrders"],
+  );
+
+export const useCancelWorkOrder = () =>
+  useInvalidatingMany(
+    (id: string) => api<WorkOrder>(`/api/work-orders/${id}/cancel`, { method: "POST" }),
+    [["workOrders"], ["alerts"]],
+  );
+
+export const useUsers = (enabled = true) =>
+  useQuery({ queryKey: ["users"], queryFn: () => api<TeamUser[]>("/api/users"), enabled });
+
+export const useCreateUser = () =>
+  useInvalidating(
+    (input: { email: string; role: Role; password: string }) =>
+      api<TeamUser>("/api/users", { method: "POST", body: input }),
+    ["users"],
+  );
+
+export const useUpdateUserRole = () =>
+  useInvalidating(
+    ({ id, role }: { id: string; role: Role }) =>
+      api<TeamUser>(`/api/users/${id}`, { method: "PATCH", body: { role } }),
+    ["users"],
+  );

@@ -28,6 +28,10 @@ export function AppLayout() {
               </span>
             )}
           </NavLink>
+          <NavLink to="/work-orders">Work orders</NavLink>
+          {(user?.role === "admin" || user?.role === "manager") && (
+            <NavLink to="/team">Team</NavLink>
+          )}
         </nav>
 
         <div className="shell-user">

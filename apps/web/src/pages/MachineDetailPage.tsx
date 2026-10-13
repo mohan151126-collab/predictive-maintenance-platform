@@ -8,6 +8,7 @@ import {
   usePlant,
   useSensors,
   useUpdateSensor,
+  useWorkOrders,
   type ThresholdsInput,
 } from "../api/hooks";
 import { SENSOR_TYPES, type Sensor, type SensorType } from "../api/types";
@@ -286,6 +287,7 @@ export function MachineDetailPage() {
   const sensors = useSensors(machineId);
   const live = useLiveReadings(machineId);
   const alerts = useAlerts({ machineId });
+  const history = useWorkOrders({ status: "COMPLETED", machineId });
   const deleteSensor = useDeleteSensor();
   const [dialog, setDialog] = useState<DialogState>(null);
   const close = useCallback(() => setDialog(null), []);
@@ -378,6 +380,42 @@ export function MachineDetailPage() {
       ) : (
         <div className="panel empty-state">
           <p>No active alerts for this machine.</p>
+        </div>
+      )}
+
+      <h2 style={{ marginTop: "1.5rem" }}>Maintenance history</h2>
+      {history.data && history.data.length > 0 ? (
+        <div className="panel table-wrap">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Completed</th>
+                <th>Work order</th>
+                <th>What was done</th>
+                <th>Parts replaced</th>
+                <th>Downtime</th>
+              </tr>
+            </thead>
+            <tbody>
+              {history.data.map((order) => (
+                <tr key={order.id}>
+                  <td className="mono">
+                    {order.completedAt ? new Date(order.completedAt).toLocaleDateString() : ""}
+                  </td>
+                  <td>{order.title}</td>
+                  <td>{order.actionTaken}</td>
+                  <td>{order.partsReplaced ?? <span className="muted">None</span>}</td>
+                  <td className="mono">
+                    {order.downtimeMinutes !== null ? `${order.downtimeMinutes} min` : "Not recorded"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="panel empty-state">
+          <p>No completed maintenance recorded for this machine yet.</p>
         </div>
       )}
 

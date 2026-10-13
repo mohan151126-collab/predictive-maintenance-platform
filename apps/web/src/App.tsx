@@ -7,6 +7,8 @@ import { MachineDetailPage } from "./pages/MachineDetailPage";
 import { PlantDetailPage } from "./pages/PlantDetailPage";
 import { PlantsPage } from "./pages/PlantsPage";
 import { RegisterPage } from "./pages/RegisterPage";
+import { TeamPage } from "./pages/TeamPage";
+import { WorkOrdersPage } from "./pages/WorkOrdersPage";
 import "./App.css";
 
 export default function App() {
@@ -19,6 +21,8 @@ export default function App() {
         <Route element={<AppLayout />}>
           <Route path="/plants" element={<PlantsPage />} />
           <Route path="/alerts" element={<AlertsPage />} />
+          <Route path="/work-orders" element={<WorkOrdersPage />} />
+          <Route path="/team" element={<TeamPage />} />
           <Route path="/plants/:plantId" element={<PlantDetailPage />} />
           <Route path="/machines/:machineId" element={<MachineDetailPage />} />
         </Route>

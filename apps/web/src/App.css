@@ -294,3 +294,11 @@
     grid-template-columns: 1fr;
   }
 }
+
+.small {
+  font-size: 0.8125rem;
+}
+
+.badge-watch {
+  color: var(--watch);
+}

@@ -77,6 +77,45 @@ export interface Alert {
   openedAt: string;
   lastEventAt: string;
   resolvedAt: string | null;
+  acknowledgedAt: string | null;
+  acknowledgedByEmail: string | null;
+  dismissedAt: string | null;
+  dismissedByEmail: string | null;
+  dismissReason: string | null;
+  workOrderId: string | null;
+}
+
+export type WorkOrderStatus = "OPEN" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+export type WorkOrderPriority = "low" | "medium" | "high" | "critical";
+
+export interface WorkOrder {
+  id: string;
+  plantId: string;
+  machineId: string;
+  machineName: string;
+  alertId: string | null;
+  title: string;
+  description: string;
+  priority: WorkOrderPriority;
+  status: WorkOrderStatus;
+  assigneeId: string | null;
+  assigneeEmail: string | null;
+  createdByEmail: string;
+  dueAt: string | null;
+  startedAt: string | null;
+  completedAt: string | null;
+  cancelledAt: string | null;
+  actionTaken: string | null;
+  partsReplaced: string | null;
+  downtimeMinutes: number | null;
+  createdAt: string;
+}
+
+export interface TeamUser {
+  id: string;
+  email: string;
+  role: Role;
+  createdAt: string;
 }
 
 export interface TelemetrySeries {
