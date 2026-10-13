@@ -10,6 +10,7 @@ dotenv.config({
 const schema = z.object({
   PORT: z.coerce.number().int().positive().default(4000),
   MONGO_URI: z.string().min(1),
+  KAFKA_BROKERS: z.string().min(1).default("localhost:9092"),
   JWT_ACCESS_SECRET: z.string().min(32),
   JWT_REFRESH_SECRET: z.string().min(32),
 });

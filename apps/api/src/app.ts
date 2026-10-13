@@ -2,6 +2,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { type ErrorRequestHandler } from "express";
 import helmet from "helmet";
+import { alertsRouter } from "./routes/alerts.js";
 import { authRouter } from "./routes/auth.js";
 import { machinesRouter } from "./routes/machines.js";
 import { meRouter } from "./routes/me.js";
@@ -34,6 +35,7 @@ export function createApp() {
   app.use("/api/plants", plantsRouter);
   app.use("/api/machines", machinesRouter);
   app.use("/api/sensors", sensorsRouter);
+  app.use("/api/alerts", alertsRouter);
 
   app.use(errorHandler);
 

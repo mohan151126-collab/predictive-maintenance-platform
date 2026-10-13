@@ -29,6 +29,8 @@ const machineSchema = new Schema(
     downtimeCostPerHour: { type: Number, min: 0, default: 0 },
     status: { type: String, enum: MACHINE_STATUSES, default: "unknown" },
     healthScore: { type: Number, min: 0, max: 100, default: null },
+    healthReasons: { type: [String], default: [] },
+    healthUpdatedAt: { type: Date },
   },
   { timestamps: true },
 );
