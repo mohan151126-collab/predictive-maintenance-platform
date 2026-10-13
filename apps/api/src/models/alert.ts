@@ -43,6 +43,12 @@ const alertSchema = new Schema(
     openedAt: { type: Date, required: true },
     lastEventAt: { type: Date, required: true },
     resolvedAt: { type: Date },
+    acknowledgedAt: { type: Date },
+    acknowledgedByEmail: { type: String },
+    dismissedAt: { type: Date },
+    dismissedByEmail: { type: String },
+    dismissReason: { type: String },
+    workOrderId: { type: Schema.Types.ObjectId, ref: "WorkOrder" },
   },
   { timestamps: true },
 );

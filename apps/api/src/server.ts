@@ -3,12 +3,14 @@ import { createApp } from "./app.js";
 import { config } from "./config.js";
 import { connectDb, disconnectDb } from "./db.js";
 import { startKafkaBridge } from "./realtime/consumer.js";
+import { setHub } from "./realtime/hubRegistry.js";
 import { attachSocketServer } from "./realtime/socket.js";
 
 await connectDb();
 
 const httpServer = createServer(createApp());
 const sockets = attachSocketServer(httpServer, "http://localhost:5173");
+setHub(sockets.hub);
 const bridge = startKafkaBridge({
   brokers: config.KAFKA_BROKERS.split(","),
   hub: sockets.hub,

@@ -8,6 +8,8 @@ import { machinesRouter } from "./routes/machines.js";
 import { meRouter } from "./routes/me.js";
 import { plantsRouter } from "./routes/plants.js";
 import { sensorsRouter } from "./routes/sensors.js";
+import { usersRouter } from "./routes/users.js";
+import { workOrdersRouter } from "./routes/workOrders.js";
 
 const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   if (err?.type === "entity.parse.failed") {
@@ -36,6 +38,8 @@ export function createApp() {
   app.use("/api/machines", machinesRouter);
   app.use("/api/sensors", sensorsRouter);
   app.use("/api/alerts", alertsRouter);
+  app.use("/api/work-orders", workOrdersRouter);
+  app.use("/api/users", usersRouter);
 
   app.use(errorHandler);
 
