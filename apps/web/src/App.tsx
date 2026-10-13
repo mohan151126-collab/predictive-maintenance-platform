@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AppLayout } from "./components/AppLayout";
 import { RequireAuth } from "./components/RequireAuth";
+import { AlertsPage } from "./pages/AlertsPage";
 import { LoginPage } from "./pages/LoginPage";
 import { MachineDetailPage } from "./pages/MachineDetailPage";
 import { PlantDetailPage } from "./pages/PlantDetailPage";
@@ -17,6 +18,7 @@ export default function App() {
       <Route element={<RequireAuth />}>
         <Route element={<AppLayout />}>
           <Route path="/plants" element={<PlantsPage />} />
+          <Route path="/alerts" element={<AlertsPage />} />
           <Route path="/plants/:plantId" element={<PlantDetailPage />} />
           <Route path="/machines/:machineId" element={<MachineDetailPage />} />
         </Route>

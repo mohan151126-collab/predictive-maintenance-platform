@@ -33,8 +33,55 @@ export interface Machine {
   downtimeCostPerHour: number;
   status: MachineStatus;
   healthScore: number | null;
+  healthReasons: string[];
+  healthUpdatedAt: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface MachineHealth {
+  machineId: string;
+  plantId: string;
+  status: MachineStatus;
+  healthScore: number | null;
+  healthReasons: string[];
+  healthUpdatedAt: string;
+}
+
+export type AlertRule =
+  | "max_exceeded"
+  | "min_exceeded"
+  | "rate_of_change"
+  | "sensor_offline";
+
+export type AlertStatus =
+  | "OPEN"
+  | "ACKNOWLEDGED"
+  | "IN_PROGRESS"
+  | "RESOLVED"
+  | "DISMISSED";
+
+export interface Alert {
+  id: string;
+  plantId: string;
+  machineId: string;
+  machineName: string;
+  sensorId: string;
+  rule: AlertRule;
+  severity: "warning" | "critical";
+  status: AlertStatus;
+  value: number | null;
+  limit: number | null;
+  message: string;
+  resolvedMessage: string | null;
+  openedAt: string;
+  lastEventAt: string;
+  resolvedAt: string | null;
+}
+
+export interface TelemetrySeries {
+  sensorId: string;
+  points: { ts: string; value: number }[];
 }
 
 export const SENSOR_TYPES = [

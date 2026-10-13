@@ -5,7 +5,7 @@ import {
   type QueryKey,
 } from "@tanstack/react-query";
 import { api } from "./client";
-import type { Machine, Plant, Sensor, SensorType } from "./types";
+import type { Alert, Machine, Plant, Sensor, SensorType, TelemetrySeries } from "./types";
 
 export interface PlantInput {
   name: string;
@@ -138,3 +138,23 @@ export const useDeleteSensor = () =>
     (id: string) => api<void>(`/api/sensors/${id}`, { method: "DELETE" }),
     ["sensors"],
   );
+
+export const useAlerts = (options: { status?: string; machineId?: string } = {}) => {
+  const status = options.status ?? "active";
+  const params = new URLSearchParams({ status });
+  if (options.machineId) params.set("machineId", options.machineId);
+  return useQuery({
+    queryKey: ["alerts", status, options.machineId ?? null],
+    queryFn: () => api<Alert[]>(`/api/alerts?${params.toString()}`),
+  });
+};
+
+export const useTelemetry = (machineId: string, minutes: number) =>
+  useQuery({
+    queryKey: ["telemetry", machineId, minutes],
+    queryFn: () =>
+      api<{ sensors: TelemetrySeries[] }>(`/api/machines/${machineId}/telemetry?minutes=${minutes}`),
+    enabled: machineId !== "",
+    staleTime: 0,
+    refetchOnMount: "always",
+  });

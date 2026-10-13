@@ -1,6 +1,7 @@
 import { useCallback, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
+  useAlerts,
   useCreateSensor,
   useDeleteSensor,
   useMachine,
@@ -11,10 +12,13 @@ import {
 } from "../api/hooks";
 import { SENSOR_TYPES, type Sensor, type SensorType } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
+import { AlertsTable } from "../components/AlertsTable";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { Dialog } from "../components/Dialog";
-import { StatusBadge } from "../components/StatusBadge";
+import { HealthCard } from "../components/HealthCard";
+import { LiveChart } from "../components/LiveChart";
 import { errorMessage } from "../lib/errors";
+import { WINDOW_MINUTES, useLiveReadings } from "../live/useLiveReadings";
 
 const TYPE_LABEL: Record<SensorType, string> = {
   vibration_rms: "Vibration (RMS)",
@@ -280,6 +284,8 @@ export function MachineDetailPage() {
   const machine = useMachine(machineId);
   const plant = usePlant(machine.data?.plantId ?? "");
   const sensors = useSensors(machineId);
+  const live = useLiveReadings(machineId);
+  const alerts = useAlerts({ machineId });
   const deleteSensor = useDeleteSensor();
   const [dialog, setDialog] = useState<DialogState>(null);
   const close = useCallback(() => setDialog(null), []);
@@ -337,25 +343,45 @@ export function MachineDetailPage() {
               <br />
               <span className="mono">{m.downtimeCostPerHour.toLocaleString()}</span>
             </p>
-            <p>
-              <span className="muted">Status</span>
-              <br />
-              <StatusBadge status={m.status} />
-            </p>
-            <p>
-              <span className="muted">Health score</span>
-              <br />
-              {m.healthScore === null ? (
-                <span className="muted">No data yet</span>
-              ) : (
-                <span className="mono">{m.healthScore} / 100</span>
-              )}
-            </p>
           </div>
         </div>
       )}
 
-      <div className="page-header">
+      {m && <HealthCard machine={m} />}
+
+      <h2 style={{ marginTop: "1.5rem" }}>Live readings</h2>
+      <p className="muted">
+        The last {WINDOW_MINUTES} minutes, updating as readings arrive.
+      </p>
+      {sensors.data && sensors.data.length > 0 ? (
+        <div className="chart-layout">
+          {sensors.data.map((sensor) => (
+            <LiveChart
+              key={sensor.id}
+              title={sensor.name}
+              unit={sensor.unit}
+              points={live.series[sensor.id] ?? []}
+              min={sensor.thresholds.min}
+              max={sensor.thresholds.max}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="panel empty-state">
+          <p>Add a sensor to see live readings here.</p>
+        </div>
+      )}
+
+      <h2 style={{ marginTop: "1.5rem" }}>Alerts</h2>
+      {alerts.data && alerts.data.length > 0 ? (
+        <AlertsTable alerts={alerts.data} showMachine={false} />
+      ) : (
+        <div className="panel empty-state">
+          <p>No active alerts for this machine.</p>
+        </div>
+      )}
+
+      <div className="page-header" style={{ marginTop: "1.5rem" }}>
         <div>
           <h2>Sensors</h2>
           <p className="muted">

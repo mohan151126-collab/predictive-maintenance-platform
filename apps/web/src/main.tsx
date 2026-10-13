@@ -5,6 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import { AuthProvider } from "./auth/AuthContext";
 import "./index.css";
+import { LiveProvider } from "./live/LiveContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -17,7 +18,9 @@ createRoot(document.getElementById("root")!).render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <AuthProvider>
-          <App />
+          <LiveProvider>
+            <App />
+          </LiveProvider>
         </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>
