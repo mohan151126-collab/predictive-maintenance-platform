@@ -2,6 +2,8 @@
   "name": "predictive-maintenance",
   "private": true,
   "scripts": {
+    "start:all": "node scripts/dev.mjs",
+    "start:core": "node scripts/dev.mjs --no-java",
     "infra:up": "docker compose up -d",
     "infra:down": "docker compose down",
     "infra:ps": "docker compose ps -a",
