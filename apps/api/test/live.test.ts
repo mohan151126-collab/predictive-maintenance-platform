@@ -41,7 +41,7 @@ afterAll(teardownDb);
 
 describe("GET /api/alerts", () => {
   beforeAll(async () => {
-    const base = { rule: "max_exceeded", severity: "critical", message: "x" };
+    const base = { rule: "max_exceeded", severity: "critical", message: "x", machineName: "Lathe" };
     await Alert.create([
       { ...base, orgId: a.orgId, plantId: a.plantId, machineId: a.machineId, sensorId: a.sensorId, status: "OPEN", openedAt: new Date("2026-10-13T10:00:00Z"), lastEventAt: new Date("2026-10-13T10:00:00Z") },
       { ...base, rule: "rate_of_change", severity: "warning", orgId: a.orgId, plantId: a.plantId, machineId: a.machineId, sensorId: a.sensorId, status: "ACKNOWLEDGED", openedAt: new Date("2026-10-13T11:00:00Z"), lastEventAt: new Date("2026-10-13T11:00:00Z") },

@@ -63,12 +63,14 @@ export async function applyAlertEvent(event: AlertEvent, hub: Hub) {
       },
       { returnDocument: "after" },
     );
+    const machine = existing ? null : await Machine.findById(event.machineId).select("name");
     const alert =
       existing ??
       (await Alert.create({
         orgId: event.orgId,
         plantId: event.plantId,
         machineId: event.machineId,
+        machineName: machine?.name ?? "Unknown machine",
         sensorId: event.sensorId,
         rule: event.rule,
         severity: event.severity,

@@ -32,6 +32,7 @@ const alertSchema = new Schema(
     plantId: objectId("Plant"),
     machineId: objectId("Machine"),
     sensorId: objectId("Sensor"),
+    machineName: { type: String, required: true },
     rule: { type: String, enum: ALERT_RULES, required: true },
     severity: { type: String, enum: ALERT_SEVERITIES, required: true },
     status: { type: String, enum: ALERT_STATUSES, default: "OPEN", required: true },

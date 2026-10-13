@@ -11,6 +11,7 @@ export interface AlertPayload {
   id: string;
   plantId: string;
   machineId: string;
+  machineName: string;
   sensorId: string;
   rule: string;
   severity: string;
@@ -28,6 +29,7 @@ export function toAlertDto(alert: {
   id: string;
   plantId: { toString(): string };
   machineId: { toString(): string };
+  machineName: string;
   sensorId: { toString(): string };
   rule: string;
   severity: string;
@@ -44,6 +46,7 @@ export function toAlertDto(alert: {
     id: alert.id,
     plantId: alert.plantId.toString(),
     machineId: alert.machineId.toString(),
+    machineName: alert.machineName,
     sensorId: alert.sensorId.toString(),
     rule: alert.rule,
     severity: alert.severity,

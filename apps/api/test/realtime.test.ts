@@ -202,6 +202,8 @@ describe("applying events", () => {
       const alerts = await Alert.find({ sensorId });
       expect(alerts).toHaveLength(1);
       expect(alerts[0]?.status).toBe("OPEN");
+      expect(alerts[0]?.machineName).toBe("Lathe");
+      expect(hub.alerts.at(-1)?.payload.machineName).toBe("Lathe");
       expect(alerts[0]?.value).toBe(9.9);
       expect(alerts[0]?.openedAt.toISOString()).toBe("2026-10-13T10:00:00.000Z");
       expect(alerts[0]?.lastEventAt.toISOString()).toBe("2026-10-13T10:00:05.000Z");
