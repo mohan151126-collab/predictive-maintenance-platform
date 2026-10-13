@@ -19,8 +19,10 @@ function log(name, text) {
   }
 }
 
+const quote = (arg) => (/[\s"]/.test(arg) ? `"${arg.replaceAll('"', '\\"')}"` : arg);
+
 function run(name, command, commandArgs, cwd = root) {
-  const child = spawn(command, commandArgs, { cwd, shell: true, windowsHide: true });
+  const child = spawn(command, commandArgs.map(quote), { cwd, shell: true, windowsHide: true });
   children.push(child);
   child.stdout.on("data", (data) => log(name, data));
   child.stderr.on("data", (data) => log(name, data));
