@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://predictive-maintenance.local/contracts/machine-health.schema.json",
+  "title": "MachineHealthEvent",
+  "description": "The current health of one machine. Published to Kafka topic machine.health, keyed by machineId.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "orgId", "plantId", "machineId", "status", "ts"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "orgId": { "type": "string", "pattern": "^[a-f0-9]{24}$" },
+    "plantId": { "type": "string", "pattern": "^[a-f0-9]{24}$" },
+    "machineId": { "type": "string", "pattern": "^[a-f0-9]{24}$" },
+    "status": { "enum": ["unknown", "healthy", "watch", "warning", "critical"] },
+    "healthScore": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "worstSensorId": { "type": "string", "pattern": "^[a-f0-9]{24}$" },
+    "reasons": {
+      "type": "array",
+      "maxItems": 10,
+      "items": { "type": "string", "minLength": 1, "maxLength": 200 }
+    },
+    "ts": { "type": "string", "format": "date-time" }
+  }
+}

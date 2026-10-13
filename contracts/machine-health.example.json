@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "orgId": "6acb97418f15672ff985c5ef",
+  "plantId": "6acba134ed0ec5f5a756b95d",
+  "machineId": "6acba4c1b8f3bc79fe53fcb9",
+  "status": "warning",
+  "healthScore": 38,
+  "worstSensorId": "6acbb105eed04b44409d2547",
+  "reasons": ["Spindle vibration is at 93% of its limit"],
+  "ts": "2026-10-13T09:15:05.000Z"
+}

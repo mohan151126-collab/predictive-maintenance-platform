@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://predictive-maintenance.local/contracts/alert.schema.json",
+  "title": "AlertEvent",
+  "description": "A sensor condition that opened or resolved. Published to Kafka topic alerts, keyed by machineId.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "orgId",
+    "plantId",
+    "machineId",
+    "sensorId",
+    "rule",
+    "state",
+    "severity",
+    "message",
+    "ts"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "orgId": { "type": "string", "pattern": "^[a-f0-9]{24}$" },
+    "plantId": { "type": "string", "pattern": "^[a-f0-9]{24}$" },
+    "machineId": { "type": "string", "pattern": "^[a-f0-9]{24}$" },
+    "sensorId": { "type": "string", "pattern": "^[a-f0-9]{24}$" },
+    "rule": {
+      "enum": ["max_exceeded", "min_exceeded", "rate_of_change", "sensor_offline"]
+    },
+    "state": { "enum": ["OPEN", "RESOLVED"] },
+    "severity": { "enum": ["warning", "critical"] },
+    "value": { "type": "number" },
+    "limit": { "type": "number" },
+    "message": { "type": "string", "minLength": 1, "maxLength": 300 },
+    "ts": { "type": "string", "format": "date-time" }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "orgId": "6acb97418f15672ff985c5ef",
+  "plantId": "6acba134ed0ec5f5a756b95d",
+  "machineId": "6acba4c1b8f3bc79fe53fcb9",
+  "sensorId": "6acbb105eed04b44409d2547",
+  "rule": "max_exceeded",
+  "state": "OPEN",
+  "severity": "critical",
+  "value": 9.4,
+  "limit": 9,
+  "message": "Spindle vibration is 9.4 mm/s, above its limit of 9 mm/s",
+  "ts": "2026-10-13T09:15:02.120Z"
+}
