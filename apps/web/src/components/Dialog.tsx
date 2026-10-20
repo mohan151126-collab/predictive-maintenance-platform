@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 
 interface DialogProps {
   title: string;
@@ -59,7 +60,9 @@ export function Dialog({ title, onClose, children }: DialogProps) {
     };
   }, [opener]);
 
-  return (
+  // Rendered on <body>: an ancestor with backdrop-filter or a transform would
+  // otherwise become the containing block of the fixed backdrop and clip it.
+  return createPortal(
     <div
       className="dialog-backdrop"
       onMouseDown={(e) => {
@@ -77,6 +80,7 @@ export function Dialog({ title, onClose, children }: DialogProps) {
         <h2 id={titleId}>{title}</h2>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
