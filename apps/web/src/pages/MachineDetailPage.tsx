@@ -1,3 +1,4 @@
+import { Pause, Play } from "@phosphor-icons/react";
 import { useCallback, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
@@ -19,7 +20,7 @@ import { Dialog } from "../components/Dialog";
 import { HealthCard } from "../components/HealthCard";
 import { LiveChart } from "../components/LiveChart";
 import { errorMessage } from "../lib/errors";
-import { WINDOW_MINUTES, useLiveReadings } from "../live/useLiveReadings";
+import { WINDOW_MINUTES, useLiveReadings, type Point } from "../live/useLiveReadings";
 
 const TYPE_LABEL: Record<SensorType, string> = {
   vibration_rms: "Vibration (RMS)",
@@ -286,6 +287,7 @@ export function MachineDetailPage() {
   const plant = usePlant(machine.data?.plantId ?? "");
   const sensors = useSensors(machineId);
   const live = useLiveReadings(machineId);
+  const [frozen, setFrozen] = useState<Record<string, Point[]> | null>(null);
   const alerts = useAlerts({ machineId });
   const history = useWorkOrders({ status: "COMPLETED", machineId });
   const deleteSensor = useDeleteSensor();
@@ -323,8 +325,8 @@ export function MachineDetailPage() {
       </div>
 
       {m && (
-        <div className="panel" style={{ marginBottom: "1.5rem" }}>
-          <div className="form-row">
+        <div className="panel" style={{ marginBottom: "var(--space-3)" }}>
+          <div className="detail-grid">
             <p>
               <span className="muted">Type</span>
               <br />
@@ -351,10 +353,25 @@ export function MachineDetailPage() {
 
       {m && <HealthCard machine={m} />}
 
-      <h2 style={{ marginTop: "1.5rem" }}>Live readings</h2>
-      <p className="muted">
-        The last {WINDOW_MINUTES} minutes, updating as readings arrive.
-      </p>
+      <div className="section-header">
+        <div>
+          <h2>Live readings</h2>
+          <p className="muted">The last {WINDOW_MINUTES} minutes, updating as readings arrive.</p>
+        </div>
+        <button
+          className="btn"
+          type="button"
+          aria-pressed={frozen !== null}
+          onClick={() => setFrozen(frozen ? null : live.series)}
+        >
+          {frozen ? (
+            <Play size={16} weight="regular" aria-hidden="true" />
+          ) : (
+            <Pause size={16} weight="regular" aria-hidden="true" />
+          )}
+          {frozen ? "Resume live updates" : "Pause live updates"}
+        </button>
+      </div>
       {sensors.data && sensors.data.length > 0 ? (
         <div className="chart-layout">
           {sensors.data.map((sensor) => (
@@ -362,19 +379,22 @@ export function MachineDetailPage() {
               key={sensor.id}
               title={sensor.name}
               unit={sensor.unit}
-              points={live.series[sensor.id] ?? []}
+              points={(frozen ?? live.series)[sensor.id] ?? []}
+              paused={frozen !== null}
               min={sensor.thresholds.min}
               max={sensor.thresholds.max}
             />
           ))}
         </div>
+      ) : sensors.isPending ? (
+        <p className="muted">Loading sensors...</p>
       ) : (
         <div className="panel empty-state">
           <p>Add a sensor to see live readings here.</p>
         </div>
       )}
 
-      <h2 style={{ marginTop: "1.5rem" }}>Alerts</h2>
+      <h2 className="section-title">Alerts</h2>
       {alerts.data && alerts.data.length > 0 ? (
         <AlertsTable alerts={alerts.data} showMachine={false} />
       ) : (
@@ -383,7 +403,7 @@ export function MachineDetailPage() {
         </div>
       )}
 
-      <h2 style={{ marginTop: "1.5rem" }}>Maintenance history</h2>
+      <h2 className="section-title">Maintenance history</h2>
       {history.data && history.data.length > 0 ? (
         <div className="panel table-wrap">
           <table className="table">
@@ -419,7 +439,7 @@ export function MachineDetailPage() {
         </div>
       )}
 
-      <div className="page-header" style={{ marginTop: "1.5rem" }}>
+      <div className="section-header">
         <div>
           <h2>Sensors</h2>
           <p className="muted">
@@ -471,7 +491,7 @@ export function MachineDetailPage() {
                 <th>Name</th>
                 <th>Type</th>
                 <th>Unit</th>
-                <th>Readings per second</th>
+                <th className="num">Readings per second</th>
                 <th>Alert limits</th>
                 {canEdit && <th className="col-actions">Actions</th>}
               </tr>
@@ -482,7 +502,7 @@ export function MachineDetailPage() {
                   <td>{sensor.name}</td>
                   <td>{TYPE_LABEL[sensor.type]}</td>
                   <td className="mono">{sensor.unit}</td>
-                  <td className="mono">{sensor.samplingHz}</td>
+                  <td className="mono num">{sensor.samplingHz}</td>
                   <td className="mono">
                     {describeLimits(sensor) ?? (
                       <span className="muted">No limits set</span>

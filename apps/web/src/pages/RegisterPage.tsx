@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { ApiError } from "../api/client";
 import { useAuth } from "../auth/AuthContext";
+import { BrandMark } from "../components/BrandMark";
 
 interface FormErrors {
   organizationName?: string;
@@ -60,6 +61,13 @@ export function RegisterPage() {
   return (
     <main className="auth-page">
       <div className="auth-panel panel">
+        <div className="auth-brand">
+          <BrandMark />
+          <span>Predictive Maintenance</span>
+        </div>
+        <p className="auth-lede">
+          Set up your organization, then add plants, machines and sensors.
+        </p>
         <h1>Create an organization</h1>
 
         {errors.form && (

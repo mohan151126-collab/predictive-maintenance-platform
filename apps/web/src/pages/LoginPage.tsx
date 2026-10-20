@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, Navigate, useLocation } from "react-router-dom";
 import { ApiError } from "../api/client";
 import { useAuth } from "../auth/AuthContext";
+import { BrandMark } from "../components/BrandMark";
 
 export function LoginPage() {
   const { status, login } = useAuth();
@@ -35,6 +36,13 @@ export function LoginPage() {
   return (
     <main className="auth-page">
       <div className="auth-panel panel">
+        <div className="auth-brand">
+          <BrandMark />
+          <span>Predictive Maintenance</span>
+        </div>
+        <p className="auth-lede">
+          Monitor machine health and plan maintenance before equipment fails.
+        </p>
         <h1>Sign in</h1>
 
         {error && (

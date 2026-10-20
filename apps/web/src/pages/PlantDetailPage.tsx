@@ -247,8 +247,8 @@ export function PlantDetailPage() {
                 <th>Model</th>
                 <th>Installed</th>
                 <th>Status</th>
-                <th>Health score</th>
-                <th>Downtime cost per hour</th>
+                <th className="num">Health score</th>
+                <th className="num">Downtime cost per hour</th>
                 {canEdit && <th className="col-actions">Actions</th>}
               </tr>
             </thead>
@@ -270,14 +270,14 @@ export function PlantDetailPage() {
                   <td>
                     <StatusBadge status={machine.status} />
                   </td>
-                  <td className="mono">
+                  <td className="mono num">
                     {machine.healthScore === null ? (
                       <span className="muted">No data</span>
                     ) : (
                       machine.healthScore
                     )}
                   </td>
-                  <td className="mono">
+                  <td className="mono num">
                     {machine.downtimeCostPerHour.toLocaleString()}
                   </td>
                   {canEdit && (

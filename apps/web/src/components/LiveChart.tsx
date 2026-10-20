@@ -7,8 +7,10 @@ interface LiveChartProps {
   points: Point[];
   min: number | null;
   max: number | null;
+  paused?: boolean;
 }
 
+const STALE_MS = 5_000;
 const INITIAL_SIZE = 360;
 const HEIGHT = 190;
 const MARGIN = { top: 12, right: 14, bottom: 26, left: 52 };
@@ -30,14 +32,30 @@ function niceStep(range: number, ticks: number) {
   return nice * power;
 }
 
+function readout(value: number) {
+  return Number(value.toFixed(2)).toString();
+}
+
 function format(value: number, step: number) {
   const decimals = step >= 1 ? 0 : Math.min(3, Math.ceil(-Math.log10(step)));
   return value.toFixed(decimals);
 }
 
-export function LiveChart({ title, unit, points, min, max }: LiveChartProps) {
+function useNow(active: boolean) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!active) return;
+    setNow(Date.now());
+    const timer = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, [active]);
+  return now;
+}
+
+export function LiveChart({ title, unit, points, min, max, paused = false }: LiveChartProps) {
   const panel = useRef<HTMLDivElement>(null);
   const [measured, setMeasured] = useState(INITIAL_SIZE);
+  const now = useNow(!paused);
 
   useEffect(() => {
     const element = panel.current;
@@ -64,6 +82,18 @@ export function LiveChart({ title, unit, points, min, max }: LiveChartProps) {
   }
 
   const exceeded = (max !== null && latest.v > max) || (min !== null && latest.v < min);
+  const age = now - latest.t;
+  const stale = !paused && age >= STALE_MS;
+  const statusText = paused
+    ? "Paused"
+    : stale
+      ? `Stale, last reading ${ago(age).replace("-", "")} ago`
+      : "Live";
+  const statusClass = paused ? "" : stale ? "live-connecting" : "live-live";
+  const readings = points.map((p) => p.v);
+  const lowest = Math.min(...readings);
+  const highest = Math.max(...readings);
+  const average = readings.reduce((sum, v) => sum + v, 0) / readings.length;
   const end = latest.t;
   const first = points[0]!;
   const start = Math.min(
@@ -104,7 +134,14 @@ export function LiveChart({ title, unit, points, min, max }: LiveChartProps) {
       <div className="chart-header">
         <h3>{title}</h3>
         <span className={exceeded ? "chart-value chart-value-bad" : "chart-value"}>
-          {format(latest.v, step)} {unit}
+          {readout(latest.v)} {unit}
+        </span>
+      </div>
+
+      <div className="chart-meta">
+        <span className={`live-indicator ${statusClass}`}>{statusText}</span>
+        <span className="mono">
+          min {readout(lowest)}, avg {readout(average)}, max {readout(highest)} {unit}
         </span>
       </div>
 
@@ -112,7 +149,7 @@ export function LiveChart({ title, unit, points, min, max }: LiveChartProps) {
         className="chart"
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
         role="img"
-        aria-label={`Last ${WINDOW_MINUTES} minutes of ${title}. Latest reading ${format(latest.v, step)} ${unit}.`}
+        aria-label={`Last ${WINDOW_MINUTES} minutes of ${title}. Latest reading ${readout(latest.v)} ${unit}. Minimum ${readout(lowest)}, average ${readout(average)}, maximum ${readout(highest)}. ${statusText}.`}
       >
         {yTicks.map((v) => (
           <g key={v}>

@@ -10,6 +10,7 @@ import type { Plant } from "../api/types";
 import { useAuth } from "../auth/AuthContext";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { Dialog } from "../components/Dialog";
+import { FleetSummary } from "../components/FleetSummary";
 import { errorMessage } from "../lib/errors";
 
 const TIME_ZONES = [
@@ -154,6 +155,8 @@ export function PlantsPage() {
           </button>
         )}
       </div>
+
+      <FleetSummary />
 
       {plants.isPending && <p className="muted">Loading plants...</p>}
 
