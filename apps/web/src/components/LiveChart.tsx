@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { WINDOW_MINUTES, type Point } from "../live/useLiveReadings";
 
 interface LiveChartProps {
@@ -54,6 +54,7 @@ function useNow(active: boolean) {
 
 export function LiveChart({ title, unit, points, min, max, paused = false }: LiveChartProps) {
   const panel = useRef<HTMLDivElement>(null);
+  const gradientId = `fill-${useId().replace(/:/g, "")}`;
   const [measured, setMeasured] = useState(INITIAL_SIZE);
   const now = useNow(!paused);
 
@@ -128,6 +129,11 @@ export function LiveChart({ title, unit, points, min, max, paused = false }: Liv
   const path = points
     .map((p, i) => `${i === 0 ? "M" : "L"}${x(p.t).toFixed(1)},${y(p.v).toFixed(1)}`)
     .join("");
+  const baseline = HEIGHT - MARGIN.bottom;
+  const area = `${path}L${x(latest.t).toFixed(1)},${baseline}L${x(first.t).toFixed(1)},${baseline}Z`;
+  const outOfLimits = points.filter(
+    (p) => (max !== null && p.v > max) || (min !== null && p.v < min),
+  );
 
   return (
     <div className="panel chart-panel" ref={panel}>
@@ -151,6 +157,13 @@ export function LiveChart({ title, unit, points, min, max, paused = false }: Liv
         role="img"
         aria-label={`Last ${WINDOW_MINUTES} minutes of ${title}. Latest reading ${readout(latest.v)} ${unit}. Minimum ${readout(lowest)}, average ${readout(average)}, maximum ${readout(highest)}. ${statusText}.`}
       >
+        <defs>
+          <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" className="chart-fill-top" />
+            <stop offset="100%" className="chart-fill-bottom" />
+          </linearGradient>
+        </defs>
+
         {yTicks.map((v) => (
           <g key={v}>
             <line className="chart-grid" x1={MARGIN.left} x2={WIDTH - MARGIN.right} y1={y(v)} y2={y(v)} />
@@ -175,7 +188,7 @@ export function LiveChart({ title, unit, points, min, max, paused = false }: Liv
         {max !== null && (
           <g>
             <line className="chart-limit" x1={MARGIN.left} x2={WIDTH - MARGIN.right} y1={y(max)} y2={y(max)} />
-            <text className="chart-limit-label" x={WIDTH - MARGIN.right - 4} y={y(max) - 4} textAnchor="end">
+            <text className="chart-limit-label" x={MARGIN.left + 4} y={y(max) - 4} textAnchor="start">
               max {format(max, step)}
             </text>
           </g>
@@ -183,13 +196,39 @@ export function LiveChart({ title, unit, points, min, max, paused = false }: Liv
         {min !== null && (
           <g>
             <line className="chart-limit" x1={MARGIN.left} x2={WIDTH - MARGIN.right} y1={y(min)} y2={y(min)} />
-            <text className="chart-limit-label" x={WIDTH - MARGIN.right - 4} y={y(min) + 12} textAnchor="end">
+            <text className="chart-limit-label" x={MARGIN.left + 4} y={y(min) + 12} textAnchor="start">
               min {format(min, step)}
             </text>
           </g>
         )}
 
+        <path className="chart-area" d={area} fill={`url(#${gradientId})`} />
         <path className="chart-line" d={path} />
+
+        {outOfLimits.map((p, i) => (
+          <rect
+            key={`${p.t}-${i}`}
+            className="chart-anomaly"
+            x={x(p.t) - 3.5}
+            y={y(p.v) - 3.5}
+            width="7"
+            height="7"
+            transform={`rotate(45 ${x(p.t)} ${y(p.v)})`}
+          />
+        ))}
+
+        <circle
+          className={exceeded ? "chart-halo chart-halo-bad" : "chart-halo"}
+          cx={x(latest.t)}
+          cy={y(latest.v)}
+          r="7"
+        />
+        <circle
+          className={exceeded ? "chart-dot chart-dot-bad" : "chart-dot"}
+          cx={x(latest.t)}
+          cy={y(latest.v)}
+          r="3.5"
+        />
       </svg>
     </div>
   );

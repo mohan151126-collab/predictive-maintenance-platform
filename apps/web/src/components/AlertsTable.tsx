@@ -33,7 +33,7 @@ export function AlertsTable({
         <thead>
           <tr>
             <th>Severity</th>
-            <th>Alert</th>
+            <th className="col-message">Alert</th>
             {showMachine && <th>Machine</th>}
             <th>Status</th>
             <th>Opened</th>
@@ -50,7 +50,7 @@ export function AlertsTable({
                     {alert.severity === "critical" ? "Critical" : "Warning"}
                   </span>
                 </td>
-                <td>
+                <td className="col-message">
                   {alert.status === "RESOLVED" && alert.resolvedMessage
                     ? alert.resolvedMessage
                     : alert.message}
