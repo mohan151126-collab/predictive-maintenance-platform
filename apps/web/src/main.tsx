@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { MotionConfig } from "motion/react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
@@ -24,7 +25,9 @@ createRoot(document.getElementById("root")!).render(
       <BrowserRouter>
         <AuthProvider>
           <LiveProvider>
-            <App />
+            <MotionConfig reducedMotion="user">
+              <App />
+            </MotionConfig>
           </LiveProvider>
         </AuthProvider>
       </BrowserRouter>

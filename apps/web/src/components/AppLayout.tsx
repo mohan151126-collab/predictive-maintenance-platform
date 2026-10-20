@@ -6,11 +6,12 @@ import {
   Wrench,
   type Icon,
 } from "@phosphor-icons/react";
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { useAlerts } from "../api/hooks";
 import { useAuth } from "../auth/AuthContext";
 import { useLive } from "../live/LiveContext";
 import { BrandMark } from "./BrandMark";
+import { PageTransition } from "./PageTransition";
 
 const LIVE_LABEL = { live: "Live", connecting: "Connecting", offline: "Offline" } as const;
 
@@ -83,7 +84,7 @@ export function AppLayout() {
       </aside>
 
       <div id="main-content" className="main-col" tabIndex={-1}>
-        <Outlet />
+        <PageTransition />
       </div>
     </div>
   );

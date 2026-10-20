@@ -82,7 +82,6 @@ html {
   }
 }
 
-.page,
 .auth-panel {
   animation: page-in 260ms var(--ease) backwards;
 }
