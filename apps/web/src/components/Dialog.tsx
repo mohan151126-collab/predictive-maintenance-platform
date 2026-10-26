@@ -30,6 +30,12 @@ export function Dialog({ title, onClose, children }: DialogProps) {
       (element.querySelector<HTMLElement>(FOCUSABLE) ?? element).focus();
     }
 
+    // A long pre-filled value would otherwise open scrolled to its end, hiding the start.
+    const field = document.activeElement;
+    const showStart = requestAnimationFrame(() => {
+      if (field instanceof HTMLInputElement && element?.contains(field)) field.scrollLeft = 0;
+    });
+
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") {
         closeRef.current();
@@ -55,6 +61,7 @@ export function Dialog({ title, onClose, children }: DialogProps) {
 
     document.addEventListener("keydown", onKeyDown);
     return () => {
+      cancelAnimationFrame(showStart);
       document.removeEventListener("keydown", onKeyDown);
       if (opener && opener !== document.body && document.contains(opener)) opener.focus();
     };
